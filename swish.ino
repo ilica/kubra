@@ -54,6 +54,8 @@ double* rawTrainingY[numTrainingSamples] = {rawLeftSwipeY, rawRightSwipeY};
 double* rawTrainingZ[numTrainingSamples] = {rawLeftSwipeZ, rawRightSwipeZ};
 
 void setup() {
+  //Serial.begin(9600);
+
   Serial.println("Starting setup!");
   delay(5000);
   setupMPU();
@@ -64,6 +66,7 @@ void setup() {
 void processRawData(){
   for (int i = 0; i < numTrainingSamples; i++) {
     Serial.print("RAW TRAINING DATA [gesture="); Serial.print(i); Serial.println("]:");
+    Serial.println("WORKING");
     //printArray(*rawTrainingX, trainingSizes[i]);
     //printArray(*rawTrainingY, trainingSizes[i]);
     //printArray(*rawTrainingZ, trainingSizes[i]);
@@ -166,10 +169,13 @@ int pollTouchPad(){
 
 double* normalizeLength(double seq[], int desiredLength, int initialLength)
 {
+  Serial.println("normLength");
+  Serial.println(desiredLength);
+  Serial.println(initialLength);
   
   float x[initialLength];
   float y[initialLength];
-
+  Serial.println("norms");
 
   for (int i = 0; i < initialLength; i++)  {
     x[i] = i;
@@ -182,7 +188,7 @@ double* normalizeLength(double seq[], int desiredLength, int initialLength)
 
   //normalized[desiredLength];
   double slope = double(initialLength)/(desiredLength-1);
-
+  Serial.println("find the slope");
   for (int i=0; i < desiredLength; i++)
   {
     double xVal = i*slope;
@@ -190,7 +196,7 @@ double* normalizeLength(double seq[], int desiredLength, int initialLength)
   }
   //printArray(normalized, desiredLength);
   //printArray(seq, initialLength);
-  
+  Serial.println("returning from norm length");
   return normalized;
 }
 
@@ -201,6 +207,7 @@ void normalizeHeight(double* x, double* y, double* z, int seqSize){
   double maxVal = 0.0;
   
   for (int d = 0; d < 3; d++){
+    
     for (int i = 0; i < seqSize; i++){
       double val;
       if (d == 0){
