@@ -1,6 +1,7 @@
-#include <BPLib.h>
-
 #include <spline.h>
+
+const byte ARROW_LEFT = 0x50;
+const byte ARROW_RIGHT = 0x4F;
 
 int potentiometerPin = A0;
 byte loopDelay = 100;
@@ -21,6 +22,8 @@ const byte numTrainingSamples = 2;
 double* trainingX[numTrainingSamples] = {};
 double* trainingY[numTrainingSamples] = {};
 double* trainingZ[numTrainingSamples] = {};
+
+byte gestToKeyCodes[numTrainingSamples] = {ARROW_LEFT, ARROW_RIGHT};
 
 // THIS HOLDS RAW TRAINING DATA
 
@@ -60,7 +63,7 @@ double* rawTrainingZ[numTrainingSamples] = {rawLeftSwipeZ, rawRightSwipeZ};
 
 void setup() {
   Serial.begin(9600);
-
+  Serial1.begin(115200);
   Serial.println("Starting setup!");
   
   //BPMod.begin(BP_MODE_HID,BP_HID_KEYBOARD);   //Begin HID Mode with HID KEYBOARD AS TYPE
@@ -106,9 +109,9 @@ boolean thisSeqHasBeenClassified = false;
 
 
 int freeRam() {
-extern int __heap_start, *__brkval;
-int v;
-return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
+  extern int __heap_start, *__brkval;
+  int v;
+  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
 
 
@@ -186,11 +189,11 @@ void loop() {
     Serial.print("CLASS: ");
 
     Serial.println(classification);
+    sendViaBluetooth(gestToKeyCodes[classification]);
     Serial.println();
     Serial.println(freeRam());
   }
 }
-
 
 // returns 0 to 1023 mapped to 0-5v
 int pollTouchPad(){
@@ -405,4 +408,29 @@ boolean isCapTouchHigh() {
   return cycles >= 3;
 }
 */
+
+void sendViaBluetooth(byte b){
+  sendViaBluetoothRaw(b);
+  releaseKeys();
+}
+
+void sendViaBluetoothRaw(byte b){
+  Serial1.write((byte)0xFD); //Start HID Report
+  Serial1.write((byte)0x9); //Length byte
+  Serial1.write((byte)0x1); //Descriptor byte
+  Serial1.write((byte)0x00); //Modifier byte
+  Serial1.write((byte)0x00); //-
+  
+  Serial1.write(b); //Send KEY
+  
+  for(byte i = 0 ; i < 5;i++){ //Send five zero bytes
+    Serial1.write((byte)0x00);
+  } 
+}
+
+void releaseKeys(){
+  sendViaBluetoothRaw(0x00);
+}
+
+
 
