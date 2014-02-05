@@ -1,3 +1,5 @@
+#include <Flash.h>
+
 #include <BPLib.h>
 
 #include <spline.h>
@@ -22,10 +24,25 @@ double* trainingX[numTrainingSamples] = {};
 double* trainingY[numTrainingSamples] = {};
 double* trainingZ[numTrainingSamples] = {};
 
+
+
+
 // THIS HOLDS RAW TRAINING DATA
+const byte TrainingSize = 26;
 
-const byte maxRawTrainingSize = 30;
+FLASH_TABLE(double, rawLeftSwipe, 26,
+    {0},
+    {0},
+    {0.0, 0.0, -0.278625, -0.504822, -0.482117, -0.247803, 0.314636, 1.309998, 1.976196, 1.999939, 1.017334, 0.080139, -0.066895, -0.227661, -0.603394, -0.64856, -0.540832, -0.432861, -0.418518, -0.378052, -0.327087, -0.318787, -0.308838, -0.222107, -0.156128, -0.116272});
 
+
+FLASH_TABLE(double, rawRightSwipe, 26,
+    {0},
+    {0},
+    {0.174133, 0.184204, -0.157043, -0.593506, -0.968872, -1.244812, -1.364441, -1.285583, -1.054077, -0.595703, -0.22821, -0.007568, 0.177368, 0.274597, 0.542358, 0.819153, 0.980835, 1.131287, 1.313171, 0.868042, 0.499268, 0.302612, 0.237244, 0.13446, 0.028198, -0.005615});
+
+
+/*
 double rawLeftSwipeX[24] = {0};
 double rawLeftSwipeY[24] = {0};
 double rawLeftSwipeZ[24] = {-0.278625, -0.504822, -0.482117, -0.247803, 0.314636, 1.309998, 1.976196, 1.999939, 1.017334, 0.080139, -0.066895, -0.227661, -0.603394, -0.64856, -0.540832, -0.432861, -0.418518, -0.378052, -0.327087, -0.318787, -0.308838, -0.222107, -0.156128, -0.116272};
@@ -33,6 +50,7 @@ double rawLeftSwipeZ[24] = {-0.278625, -0.504822, -0.482117, -0.247803, 0.314636
 double rawRightSwipeX[26] = {0};
 double rawRightSwipeY[26] = {0};
 double rawRightSwipeZ[26] = {0.174133, 0.184204, -0.157043, -0.593506, -0.968872, -1.244812, -1.364441, -1.285583, -1.054077, -0.595703, -0.22821, -0.007568, 0.177368, 0.274597, 0.542358, 0.819153, 0.980835, 1.131287, 1.313171, 0.868042, 0.499268, 0.302612, 0.237244, 0.13446, 0.028198, -0.005615};
+*/
 
 /*
 double rawUpSwipeX[23] = {-0.850708, -1.253418, -1.720947, -2.0, -2.0, -1.209351, -0.729797, -0.401001, -0.02124, 0.487305, 0.99231, 1.455078, 1.435425, 1.188171, 0.944031, 0.832397, 0.638916, 0.364441, 0.171753, 0.201416, 0.125183, 0.042297, 0.039368};
@@ -46,7 +64,7 @@ double rawDownSwipeY[28] = {0};
 double rawDownSwipeZ[28] = {0};
 */
 
-const byte trainingSizes[numTrainingSamples] = {24, 26};
+
 
 // THIS HOLDS PROCESSED TRAINING DATA
 double* rawTrainingX[numTrainingSamples] = {rawLeftSwipeX, rawRightSwipeX};
@@ -79,16 +97,15 @@ void processRawData(){
     //printArray(*rawTrainingX, trainingSizes[i]);
     //printArray(*rawTrainingY, trainingSizes[i]);
     //printArray(*rawTrainingZ, trainingSizes[i]);
-    int gestSize = trainingSizes[i];
-    normalizeHeight(rawTrainingX[i], rawTrainingY[i], rawTrainingZ[i], gestSize);
+    normalizeHeight(rawTrainingX[i], rawTrainingY[i], rawTrainingZ[i], TrainingSize);
     //printArray(rawTrainingX[i], trainingSizes[i]);
    
-    double* newX = normalizeLength(rawTrainingX[i], trainedDataSize, gestSize);
+    double* newX = normalizeLength(rawTrainingX[i], trainedDataSize, TrainingSize);
   
  
-    double* newY = normalizeLength(rawTrainingY[i], trainedDataSize, gestSize);
+    double* newY = normalizeLength(rawTrainingY[i], trainedDataSize, TrainingSize);
    
-    double* newZ = normalizeLength(rawTrainingZ[i], trainedDataSize, gestSize);
+    double* newZ = normalizeLength(rawTrainingZ[i], trainedDataSize, TrainingSize);
     
     //printArray(newX, trainingSizes[i]);
     
