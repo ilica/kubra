@@ -2,21 +2,24 @@
 
 const byte ARROW_LEFT = 0x50;
 const byte ARROW_RIGHT = 0x4F;
-const byte ARROW_UP = 0x52;
-const byte ARROW_DOWN = 0x51;
+const byte ARROW_UP = 0x51;
+const byte ARROW_DOWN = 0x52;
 
 int potentiometerPin = A0;
 byte loopDelay = 100;
 //arrays fixed size so we need to determine the maximum size a gesture can be: 10*100=1000ms=1s long gesture
-double* accel_X = new double[40];
-double* accel_Y = new double[40];
-double* accel_Z = new double[40];
+
+const int maxGestSize = 40;
+double* accel_X = new double[maxGestSize];
+double* accel_Y = new double[maxGestSize];
+double* accel_Z = new double[maxGestSize];
 
 //int capTouchSensor = 10;
 
 int index = 0;
 
 const byte trainedDataSize = 10;
+const int minGestSize = 10;
 
 const byte numTrainingSamples = 4;
 
@@ -34,11 +37,11 @@ const double rightSwipeX[trainedDataSize] = {0};
 const double rightSwipeY[trainedDataSize] = {0};
 const double rightSwipeZ[trainedDataSize] = {0.1276222, -0.3994384, -0.9805164, -0.5485724, 0.0697532, 0.4876562, 0.8735553, 0.3338853, 0.0898926, -0.0041152};
 
-const double downSwipeX[trainedDataSize] = {-0.1276222, 0.3994384, 0.9805164, 0.5485724, -0.0697532, -0.4876562, -0.8735553, -0.3338853, -0.0898926, 0.0041152};
+const double downSwipeX[trainedDataSize] = {0.05, 0.50, 0.99, 0.01, -0.28, -0.78, -0.60, -0.40, 0.01, 0.03};
 const double downSwipeY[trainedDataSize] = {0};
 const double downSwipeZ[trainedDataSize] = {0};
 
-const double upSwipeX[trainedDataSize] = {0.1276222, -0.3994384, -0.9805164, -0.5485724, 0.0697532, 0.4876562, 0.8735553, 0.3338853, 0.0898926, -0.0041152};
+const double upSwipeX[trainedDataSize] = {-0.42, -0.94, -0.58, -0.07, 0.55, 0.62, 0.38, 0.10, 0.04, 0.02};
 const double upSwipeY[trainedDataSize] = {0};
 const double upSwipeZ[trainedDataSize] = {0};
 
@@ -58,6 +61,28 @@ void setup() {
   setupMPU();
   //processRawData();
   Serial.println("All setup!");
+  
+  ////////
+  
+  /*double rawUpSwipeX[23] = {-0.850708, -1.253418, -1.720947, -2.0, -2.0, -1.209351, -0.729797, -0.401001, -0.02124, 0.487305, 0.99231, 1.455078, 1.435425, 1.188171, 0.944031, 0.832397, 0.638916, 0.364441, 0.171753, 0.201416, 0.125183, 0.042297, 0.039368};
+
+
+    double rawDownSwipeX[28] = {0.211182, 0.534546, 1.451355, 1.999939, 1.999939, 1.999939, 1.999939, 1.925964, 1.108398, 0.145447, -0.226379, -0.076111, -0.421082, -0.711487, -1.337769, -1.551697, -1.566528, -1.665649, -1.486389, -1.043396, -0.509644, -0.730835, -0.812744, -0.355896, -0.046814, 0.024414, 0.056946, 0.066223};
+    double zeros1[23] = {0};
+    double zeros2[23] = {0};  
+    double zeros3[28] = {0};
+    double zeros4[28] = {0};    
+    //normalizeHeight(rawUpSwipeX, zeros1, zeros2, 23);
+    normalizeHeight(rawDownSwipeX, zeros1, zeros2, 28);
+    //printArray(rawTrainingX[i], trainingSizes[i]);
+   
+    //double* newX = normalizeLength(rawUpSwipeX, trainedDataSize, 23);
+    double* newX2 = normalizeLength(rawDownSwipeX, trainedDataSize, 28);
+    //printArray(newX, 10);
+    printArray(newX2, 10);
+    */
+  ////////
+  
   
   Serial.println(freeRam());
 }
@@ -92,7 +117,7 @@ void loop() {
   if (gestTakingPlace(maxGestureSize))
   {
     thisSeqHasBeenClassified = false;
-    if (index == maxGestureSize)
+    if (index == maxGestSize)
     {
       index = 0;
       return;
@@ -116,6 +141,12 @@ void loop() {
     delay(tickMilliDelay-(millis()-startTime));
   } else if (!thisSeqHasBeenClassified) {
     thisSeqHasBeenClassified = true;
+    
+    if (index < minGestSize){
+      Serial.println();
+      index = 0;
+      return;
+    }
     
     normalizeHeight(accel_X, accel_Y, accel_Z, index);
     double* newX = normalizeLength(accel_X, trainedDataSize, index);
