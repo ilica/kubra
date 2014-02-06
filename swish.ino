@@ -6,9 +6,9 @@ const byte ARROW_RIGHT = 0x4F;
 int potentiometerPin = A0;
 byte loopDelay = 100;
 //arrays fixed size so we need to determine the maximum size a gesture can be: 10*100=1000ms=1s long gesture
-double accel_X[40];
-double accel_Y[40];
-double accel_Z[40];
+double* accel_X = new double[40];
+double* accel_Y = new double[40];
+double* accel_Z = new double[40];
 
 //int capTouchSensor = 10;
 
@@ -18,48 +18,24 @@ const byte trainedDataSize = 10;
 
 const byte numTrainingSamples = 2;
 
-// THIS HOLDS PROCESSED TRAINING DATA
-double* trainingX[numTrainingSamples] = {};
-double* trainingY[numTrainingSamples] = {};
-double* trainingZ[numTrainingSamples] = {};
-
 byte gestToKeyCodes[numTrainingSamples] = {ARROW_LEFT, ARROW_RIGHT};
 
 // THIS HOLDS RAW TRAINING DATA
 
 const byte maxRawTrainingSize = 30;
 
-double rawLeftSwipeX[24] = {0};
-double rawLeftSwipeY[24] = {0};
-double rawLeftSwipeZ[24] = {-0.278625, -0.504822, -0.482117, -0.247803, 0.314636, 1.309998, 1.976196, 1.999939, 1.017334, 0.080139, -0.066895, -0.227661, -0.603394, -0.64856, -0.540832, -0.432861, -0.418518, -0.378052, -0.327087, -0.318787, -0.308838, -0.222107, -0.156128, -0.116272};
+const double leftSwipeX[trainedDataSize] = {0};
+const double leftSwipeY[trainedDataSize] = {0};
+const double leftSwipeZ[trainedDataSize] = {-0.1393167, -0.1629588, 0.7660555, 0.5086825, -0.0870388, -0.3063347, -0.2092654, -0.1607817, -0.1000600, -0.0581378};
 
-double rawRightSwipeX[26] = {0};
-double rawRightSwipeY[26] = {0};
-double rawRightSwipeZ[26] = {0.174133, 0.184204, -0.157043, -0.593506, -0.968872, -1.244812, -1.364441, -1.285583, -1.054077, -0.595703, -0.22821, -0.007568, 0.177368, 0.274597, 0.542358, 0.819153, 0.980835, 1.131287, 1.313171, 0.868042, 0.499268, 0.302612, 0.237244, 0.13446, 0.028198, -0.005615};
-
-/*
-double rawUpSwipeX[23] = {-0.850708, -1.253418, -1.720947, -2.0, -2.0, -1.209351, -0.729797, -0.401001, -0.02124, 0.487305, 0.99231, 1.455078, 1.435425, 1.188171, 0.944031, 0.832397, 0.638916, 0.364441, 0.171753, 0.201416, 0.125183, 0.042297, 0.039368};
-double rawUpSwipeY[23] = {0};
-double rawUpSwipeZ[23] = {0};
-*/
-
-/*
-double rawDownSwipeX[28] = {0.211182, 0.534546, 1.451355, 1.999939, 1.999939, 1.999939, 1.999939, 1.925964, 1.108398, 0.145447, -0.226379, -0.076111, -0.421082, -0.711487, -1.337769, -1.551697, -1.566528, -1.665649, -1.486389, -1.043396, -0.509644, -0.730835, -0.812744, -0.355896, -0.046814, 0.024414, 0.056946, 0.066223};
-double rawDownSwipeY[28] = {0};
-double rawDownSwipeZ[28] = {0};
-*/
-
-const byte trainingSizes[numTrainingSamples] = {24, 26};
+const double rightSwipeX[trainedDataSize] = {0};
+const double rightSwipeY[trainedDataSize] = {0};
+const double rightSwipeZ[trainedDataSize] = {0.1276222, -0.3994384, -0.9805164, -0.5485724, 0.0697532, 0.4876562, 0.8735553, 0.3338853, 0.0898926, -0.0041152};
 
 // THIS HOLDS PROCESSED TRAINING DATA
-double* rawTrainingX[numTrainingSamples] = {rawLeftSwipeX, rawRightSwipeX};
-double* rawTrainingY[numTrainingSamples] = {rawLeftSwipeY, rawRightSwipeY};
-double* rawTrainingZ[numTrainingSamples] = {rawLeftSwipeZ, rawRightSwipeZ};
-
-
-// BLUETOOTH 
-//BPLib BPMod;
-
+const double* trainingX[numTrainingSamples] = {leftSwipeX, rightSwipeX};
+const double* trainingY[numTrainingSamples] = {leftSwipeY, rightSwipeY};
+const double* trainingZ[numTrainingSamples] = {leftSwipeZ, rightSwipeZ};
 
 void setup() {
   Serial.begin(9600);
@@ -70,40 +46,12 @@ void setup() {
   
   delay(5000);
   setupMPU();
-  processRawData();
+  //processRawData();
   Serial.println("All setup!");
+  
+  Serial.println(freeRam());
 }
 
-void processRawData(){
-  //Serial.println("processing");
-  for (int i = 0; i < numTrainingSamples; i++) {
-    //Serial.print("RAW TRAINING DATA [gesture="); Serial.print(i); Serial.println("]:");
-    //Serial.println("WORKING");
-    //printArray(*rawTrainingX, trainingSizes[i]);
-    //printArray(*rawTrainingY, trainingSizes[i]);
-    //printArray(*rawTrainingZ, trainingSizes[i]);
-    int gestSize = trainingSizes[i];
-    normalizeHeight(rawTrainingX[i], rawTrainingY[i], rawTrainingZ[i], gestSize);
-    //printArray(rawTrainingX[i], trainingSizes[i]);
-   
-    double* newX = normalizeLength(rawTrainingX[i], trainedDataSize, gestSize);
-  
- 
-    double* newY = normalizeLength(rawTrainingY[i], trainedDataSize, gestSize);
-   
-    double* newZ = normalizeLength(rawTrainingZ[i], trainedDataSize, gestSize);
-    
-    //printArray(newX, trainingSizes[i]);
-    
-    //Serial.print("PROCESSESD TRAINING DATA: [gesture="); Serial.print(i); Serial.println("]:");
-    //printArray(newX, trainedDataSize);
-    //printArray(newY, trainedDataSize);
-    //printArray(newZ, trainedDataSize);
-    trainingX[i] = newX;
-    trainingY[i] = newY;
-    trainingZ[i] = newZ;
-  }  
-}
 
 boolean thisSeqHasBeenClassified = false;
 
@@ -116,7 +64,6 @@ int freeRam() {
 
 
 void loop() {
-  //Serial.println(freeRam());
   unsigned long startTime = millis();
   byte tickMilliDelay = 25;
   
@@ -206,17 +153,19 @@ double* normalizeLength(double seq[], int desiredLength, int initialLength)
   //Serial.println("normLength");
   //Serial.println(desiredLength);
   
-  float x[initialLength];
-  float y[initialLength];
+  float* x = new float[initialLength];
+  float* y = new float[initialLength];
   //Serial.println("norms");
 
   for (int i = 0; i < initialLength; i++)  {
     x[i] = i;
     y[i] = float(seq[i]);
   }
-  
 
   Spline linearSpline(x,y,initialLength,1);
+  
+  delete[] x;
+  delete[] y;
 
   double* normalized = new double[desiredLength];
 
@@ -291,11 +240,10 @@ int classify(double* gestureX, double* gestureY, double* gestureZ){
     }
   }
   
-  
   return bestGesture;
 }
 
-double squaredLossDifference(double a[], double b[], int dataSize){
+double squaredLossDifference(double a[], const double b[], int dataSize){
   double sum = 0;
   
   for (int i = 0; i < dataSize; i++){
@@ -304,12 +252,11 @@ double squaredLossDifference(double a[], double b[], int dataSize){
     sum += (a[i] - b[i]) * (a[i] - b[i]);
   }
   
-  //printArray(b, dataSize);
   //Serial.println(sum);
   return sum;
 }
 
-/*
+
 void printArray(double* a, int length){
   for (int i = 0; i < length; i++){
     Serial.print(a[i]);
@@ -317,11 +264,11 @@ void printArray(double* a, int length){
   }
   Serial.println();
 }
-*/
+
 
 // A simple queue with a pointer to the front of it
 const byte qSize = 5;
-double lastMags[qSize];
+double* lastMags = new double[qSize];
 int front = 0;
 
 boolean gestTakingPlace(int maxGestureSize){
