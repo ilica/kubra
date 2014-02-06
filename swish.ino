@@ -2,6 +2,8 @@
 
 const byte ARROW_LEFT = 0x50;
 const byte ARROW_RIGHT = 0x4F;
+const byte ARROW_UP = 0x52;
+const byte ARROW_DOWN = 0x51;
 
 int potentiometerPin = A0;
 byte loopDelay = 100;
@@ -16,9 +18,9 @@ int index = 0;
 
 const byte trainedDataSize = 10;
 
-const byte numTrainingSamples = 2;
+const byte numTrainingSamples = 4;
 
-byte gestToKeyCodes[numTrainingSamples] = {ARROW_LEFT, ARROW_RIGHT};
+byte gestToKeyCodes[numTrainingSamples] = {ARROW_LEFT, ARROW_RIGHT, ARROW_DOWN, ARROW_UP};
 
 // THIS HOLDS RAW TRAINING DATA
 
@@ -32,10 +34,18 @@ const double rightSwipeX[trainedDataSize] = {0};
 const double rightSwipeY[trainedDataSize] = {0};
 const double rightSwipeZ[trainedDataSize] = {0.1276222, -0.3994384, -0.9805164, -0.5485724, 0.0697532, 0.4876562, 0.8735553, 0.3338853, 0.0898926, -0.0041152};
 
+const double downSwipeX[trainedDataSize] = {-0.1276222, 0.3994384, 0.9805164, 0.5485724, -0.0697532, -0.4876562, -0.8735553, -0.3338853, -0.0898926, 0.0041152};
+const double downSwipeY[trainedDataSize] = {0};
+const double downSwipeZ[trainedDataSize] = {0};
+
+const double upSwipeX[trainedDataSize] = {0.1276222, -0.3994384, -0.9805164, -0.5485724, 0.0697532, 0.4876562, 0.8735553, 0.3338853, 0.0898926, -0.0041152};
+const double upSwipeY[trainedDataSize] = {0};
+const double upSwipeZ[trainedDataSize] = {0};
+
 // THIS HOLDS PROCESSED TRAINING DATA
-const double* trainingX[numTrainingSamples] = {leftSwipeX, rightSwipeX};
-const double* trainingY[numTrainingSamples] = {leftSwipeY, rightSwipeY};
-const double* trainingZ[numTrainingSamples] = {leftSwipeZ, rightSwipeZ};
+const double* trainingX[numTrainingSamples] = {leftSwipeX, rightSwipeX, downSwipeX, upSwipeX};
+const double* trainingY[numTrainingSamples] = {leftSwipeY, rightSwipeY, downSwipeY, upSwipeY};
+const double* trainingZ[numTrainingSamples] = {leftSwipeZ, rightSwipeZ, downSwipeZ, upSwipeZ};
 
 void setup() {
   Serial.begin(9600);
@@ -92,14 +102,14 @@ void loop() {
     accel_Y[index] = accelY();
     accel_Z[index] = accelZ();
 
-    /*
+    
     Serial.print(accel_X[index], 6);
     Serial.print(" ");
     Serial.print(accel_Y[index], 6);
     Serial.print(" ");
     Serial.print(accel_Z[index], 6);
     Serial.println();
-    */
+    
     
     index++;
 
