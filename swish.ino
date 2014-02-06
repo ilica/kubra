@@ -23,7 +23,7 @@ double* accel_X = new double[maxGestSize];
 double* accel_Y = new double[maxGestSize];
 double* accel_Z = new double[maxGestSize];
 
-const byte capTouchSensor = 10;
+const byte capTouchSensor = 8;
 
 int index = 0;
 
