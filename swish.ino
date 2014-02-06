@@ -30,9 +30,9 @@ int index = 0;
 const byte trainedDataSize = 10;
 const int minGestSize = 10;
 
-const byte numTrainingSamples = 4;
+const byte numTrainingSamples = 2;
 
-int gestToKeyCodes[numTrainingSamples] = {ARROW_LEFT, ARROW_RIGHT, ARROW_DOWN, ARROW_UP};
+int gestToKeyCodes[numTrainingSamples] = {ARROW_LEFT, ARROW_RIGHT};
 
 // THIS HOLDS RAW TRAINING DATA
 
@@ -46,18 +46,11 @@ const double rightSwipeX[trainedDataSize] = {0};
 const double rightSwipeY[trainedDataSize] = {0};
 const double rightSwipeZ[trainedDataSize] = {-0.12, -1.00, -0.58, -0.27, 0.29, 0.75, 0.76, 0.20, 0.07, 0.05};
 
-const double downSwipeX[trainedDataSize] = {-0.07, -1.00, -1.00, -0.48, 0.92, 1.00, 0.89, 0.11, -0.05, -0.04};
-const double downSwipeY[trainedDataSize] = {0};
-const double downSwipeZ[trainedDataSize] = {0};
-
-const double upSwipeX[trainedDataSize] = {0.10, 0.83, 0.95, 0.20, -0.69, -1.00, -0.29, -0.02, 0.01, 0.02};
-const double upSwipeY[trainedDataSize] = {0};
-const double upSwipeZ[trainedDataSize] = {0};
 
 // THIS HOLDS PROCESSED TRAINING DATA
-const double* trainingX[numTrainingSamples] = {leftSwipeX, rightSwipeX, downSwipeX, upSwipeX};
-const double* trainingY[numTrainingSamples] = {leftSwipeY, rightSwipeY, downSwipeY, upSwipeY};
-const double* trainingZ[numTrainingSamples] = {leftSwipeZ, rightSwipeZ, downSwipeZ, upSwipeZ};
+const double* trainingX[numTrainingSamples] = {leftSwipeX, rightSwipeX};
+const double* trainingY[numTrainingSamples] = {leftSwipeY, rightSwipeY};
+const double* trainingZ[numTrainingSamples] = {leftSwipeZ, rightSwipeZ};
 
 void setup() {
   Serial.begin(9600);
@@ -124,12 +117,12 @@ void loop() {
   
   unsigned long startTime = millis();
   byte tickMilliDelay = 25;
-  Serial.println(accelX());
+  //Serial.println(accelX());
   // 1000/tickMilliDelay times per second, run this code
   // Make sure the code can run in less than 1000/tickMilliDelay seconds.
   
   pollMPU(); 
-  Serial.println("AFTER");
+  //Serial.println("AFTER");
   int maxGestureSize = 1000 / tickMilliDelay;
   
   
