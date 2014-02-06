@@ -10,6 +10,10 @@ const byte PLAY_PAUSE = 0x80;
 const byte VOL_UP = 0x10;
 const byte VOL_DOWN = 0x20;
 
+const byte ZERO_HEX  = 0x00;
+const byte NEXT_HIGH = 0x02;
+const byte PREV_HIGH = 0x04;
+
 int potentiometerPin = A0;
 byte loopDelay = 100;
 //arrays fixed size so we need to determine the maximum size a gesture can be: 10*100=1000ms=1s long gesture
@@ -19,7 +23,7 @@ double* accel_X = new double[maxGestSize];
 double* accel_Y = new double[maxGestSize];
 double* accel_Z = new double[maxGestSize];
 
-//int capTouchSensor = 10;
+const byte capTouchSensor = 10;
 
 int index = 0;
 
@@ -120,18 +124,18 @@ void loop() {
   
   unsigned long startTime = millis();
   byte tickMilliDelay = 25;
-  
+  Serial.println(accelX());
   // 1000/tickMilliDelay times per second, run this code
   // Make sure the code can run in less than 1000/tickMilliDelay seconds.
-
-  pollMPU(); 
   
+  pollMPU(); 
+  Serial.println("AFTER");
   int maxGestureSize = 1000 / tickMilliDelay;
   
   
-  /*if (!isCapTouchHigh()) {
+  if (!isCapTouchHigh()) {
     return;
-  }*/
+  }
   
   if (gestTakingPlace(maxGestureSize))
   {
@@ -199,14 +203,14 @@ void loop() {
     Serial.println();
     
     if (classification == 3){
-      sendConsumerKey(VOL_UP);
-      sendConsumerKey(VOL_UP);
-      sendConsumerKey(VOL_UP);
+      sendConsumerKey(ZERO_HEX, NEXT_HIGH);
+     // sendConsumerKey(VOL_UP);
+      //sendConsumerKey(VOL_UP);
       return;
     } else if (classification == 2) {
-      sendConsumerKey(VOL_DOWN);
-      sendConsumerKey(VOL_DOWN);
-      sendConsumerKey(VOL_DOWN);
+      sendConsumerKey(ZERO_HEX, PREV_HIGH);
+      //sendConsumerKey(VOL_DOWN);
+      //sendConsumerKey(VOL_DOWN);
       return;
     }
     
@@ -364,7 +368,7 @@ boolean gestTakingPlace(int maxGestureSize){
   return avgMag > thresh;
 }
 
-/*
+
 boolean isCapTouchHigh() {
   // Variables used to translate from Arduino to AVR pin naming
   volatile uint8_t* port;
@@ -421,10 +425,10 @@ boolean isCapTouchHigh() {
   //  sensors.
   *port &= ~(bitmask);
   *ddr  |= bitmask;
-
-  return cycles >= 3;
+  //Serial.println(cycles);
+  return cycles >= 2;
 }
-*/
+
 
 void sendViaBluetooth(byte b){
   sendViaBluetoothRaw(b);
@@ -445,13 +449,13 @@ void sendViaBluetoothRaw(int b){
   } 
 }
 
-void sendConsumerKey(byte b){
+void sendConsumerKey(byte low, byte high){
   Serial1.write((byte)0xFD);
   Serial1.write((byte)0x03);
   Serial1.write((byte)0x03);
   
-  Serial1.write(b);
-  Serial1.write((byte)0x00);
+  Serial1.write(low);
+  Serial1.write(high);
 
   Serial1.write((byte)0xFD);
   Serial1.write((byte)0x03);
