@@ -98,7 +98,7 @@ void setup() {
     */
   ////////
   
-  
+  pinMode(capTouchSensor, INPUT);
   Serial.println(freeRam());
 }
 
@@ -125,8 +125,8 @@ void loop() {
   //Serial.println("AFTER");
   int maxGestureSize = 1000 / tickMilliDelay;
   
-  
-  if (!isCapTouchHigh()) {
+  if (digitalRead(capTouchSensor) == LOW) {
+    index = 0;
     return;
   }
   
@@ -361,7 +361,7 @@ boolean gestTakingPlace(int maxGestureSize){
   return avgMag > thresh;
 }
 
-
+/*
 boolean isCapTouchHigh() {
   // Variables used to translate from Arduino to AVR pin naming
   volatile uint8_t* port;
@@ -418,10 +418,10 @@ boolean isCapTouchHigh() {
   //  sensors.
   *port &= ~(bitmask);
   *ddr  |= bitmask;
-  //Serial.println(cycles);
+  Serial.println(cycles);
   return cycles >= 2;
 }
-
+*/
 
 void sendViaBluetooth(byte b){
   sendViaBluetoothRaw(b);
