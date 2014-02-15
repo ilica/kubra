@@ -680,28 +680,32 @@ double normalizeAccel(int accel){
   return double(accel) / 16384;
 }
 
+double normalizeGyro(int gyro){
+  return double(gyro) / 250;
+}
+
 double accelX(){
-  return normalizeAccel(accel_t_gyro.value.x_gyro);
+  return normalizeAccel(accel_t_gyro.value.x_accel);
 }
 
 double accelY(){
-  return normalizeAccel(accel_t_gyro.value.y_gyro);
+  return normalizeAccel(accel_t_gyro.value.y_accel);
 }
 
 double accelZ(){
-  return normalizeAccel(accel_t_gyro.value.z_gyro);
+  return normalizeAccel(accel_t_gyro.value.z_accel) - 1.0;
 }
 
 double gyroX(){
-  return accel_t_gyro.value.x_gyro;
+  return normalizeGyro(accel_t_gyro.value.x_gyro);
 }
 
 double gyroY(){
-  return accel_t_gyro.value.y_gyro;
+  return normalizeGyro(accel_t_gyro.value.y_gyro);
 }
 
 double gyroZ(){
-  return accel_t_gyro.value.z_gyro;
+  return normalizeGyro(accel_t_gyro.value.z_gyro);
 }
 // --------------------------------------------------------
 // MPU6050_read
