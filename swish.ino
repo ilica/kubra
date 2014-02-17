@@ -14,6 +14,10 @@ const byte ZERO_HEX  = 0x00;
 const byte NEXT_HIGH = 0x02;
 const byte PREV_HIGH = 0x04;
 
+const byte tickMilliDelay = 25;
+double dt = ((double)tickMilliDelay) / 1000.0;
+
+
 int potentiometerPin = A0;
 byte loopDelay = 100;
 //arrays fixed size so we need to determine the maximum size a gesture can be: 10*100=1000ms=1s long gesture
@@ -38,41 +42,54 @@ int gestToKeyCodes[numTrainingSamples] = {ARROW_LEFT, ARROW_RIGHT, ARROW_DOWN, A
 
 const byte maxRawTrainingSize = 30;
 
-const double leftSwipeX[trainedDataSize] = {0};
-const double leftSwipeY[trainedDataSize] = {0};
-const double leftSwipeZ[trainedDataSize] = {0.26, 1.00, 1.00, 0.19, -0.04, -0.97, -0.97, -0.41, -0.05, -0.11};
 
-const double rightSwipeX[trainedDataSize] = {0};
-const double rightSwipeY[trainedDataSize] = {0};
-const double rightSwipeZ[trainedDataSize] = {-0.12, -1.00, -0.58, -0.27, 0.29, 0.75, 0.76, 0.20, 0.07, 0.05};
-
-const double downSwipeX[trainedDataSize] = {-0.07, -1.00, -1.00, -0.48, 0.92, 1.00, 0.89, 0.11, -0.05, -0.04};
-const double downSwipeY[trainedDataSize] = {0};
-const double downSwipeZ[trainedDataSize] = {0};
-
-const double upSwipeX[trainedDataSize] = {0.10, 0.83, 0.95, 0.20, -0.69, -1.00, -0.29, -0.02, 0.01, 0.02};
-const double upSwipeY[trainedDataSize] = {0};
-const double upSwipeZ[trainedDataSize] = {0};
 
 // THIS HOLDS PROCESSED TRAINING DATA
-const double* trainingX[numTrainingSamples] = {leftSwipeX, rightSwipeX, downSwipeX, upSwipeX};
-const double* trainingY[numTrainingSamples] = {leftSwipeY, rightSwipeY, downSwipeY, upSwipeY};
-const double* trainingZ[numTrainingSamples] = {leftSwipeZ, rightSwipeZ, downSwipeZ, upSwipeZ};
+const double* trainingX[numTrainingSamples] = {};
+const double* trainingY[numTrainingSamples] = {};
+const double* trainingZ[numTrainingSamples] = {};
 
 void setup() {
   Serial.begin(9600);
   Serial1.begin(115200);
-  Serial.println("Starting setup!");
   
   //BPMod.begin(BP_MODE_HID,BP_HID_KEYBOARD);   //Begin HID Mode with HID KEYBOARD AS TYPE
   
   delay(5000);
   setupMPU();
-  //processRawData();
   Serial.println("All setup!");
+
+  //double gestY[trainedDataSize] = {0.10, 0.83, 0.95, 0.20, -0.69, -1.00, -0.29, -0.02, 0.01, 0.02};
+
+  double rawSSwipeZ[45] = {18.483999, 25.336, 47.768001, 66.419998, 51.172, 25.555999, -0.768, -8.420001, -8.82, -17.299999, -35.04, -41.736, -34.448001, -35.944, -41.84, -33.495998, -28.239999, -30.559999, -29.576, -36.027999, -37.291999, -51.368, -64.484001, -42.527999, -47.063999, -43.872001, -55.655998, -33.659999, -28.992, -31.808, -40.776, -26.267999, -14.936, 7.832, 25.587999, 32.195999, 41.335998, 43.212001, 47.875999, 56.144001, 40.763999, 34.835998, 19.107999, 16.767999, 7.532};
+  //double rawSSwipeZ[45] = {1.7, 4.192, 20.455999, 42.155998, 48.720001, 38.448001, 29.36, 18.752, 18.931999, 19.856, 15.484001, 6.168, 4.808, -4.012, -22.827999, -37.287998, -41.591999, -43.268001, -33.063999, -34.555999, -36.551998, -36.956001, -30.395999, -13.592, -9.384, -1.636, 4.564, 11.812001, 16.403999, 17.04, 22.076, 32.291999, 42.551998, 45.372001, 38.423999, 27.591999, 20.219999, 24.423999, 29.643999, 37.363998, 25.908, 7.936, -6.74, -5.56, -0.9};
+ 
+  for (int i = 0; i < 45; i++){
+    // rawSSwipeX[i] = rawSSwipeX[i] * dt;
+     rawSSwipeZ[i] = rawSSwipeZ[i] * dt;
+  }  
+  
+  for (int i = 1; i < 45; i++){
+    //rawSSwipeX[i] = rawSSwipeX[i-1] + (rawSSwipeX[i]); 
+    rawSSwipeZ[i] = rawSSwipeZ[i-1] + (rawSSwipeZ[i]);
+  }
+
+  //anglesToPos(rawSSwipeX, 45);
+  anglesToPos(rawSSwipeZ, 45);
+  
+  //normalizeHeight(rawSSwipeX, 45);
+  normalizeHeight(rawSSwipeZ, 45);
+  
+  //double* newY = normalizeLength(rawSSwipeX, trainedDataSize, 45);
+  double* newZ = normalizeLength(rawSSwipeZ, trainedDataSize, 45);
+  
+  //printArray(newY, 10);
+  printArray(newZ, 10);
   
   Serial.println(freeRam());
 }
+
+
 
 boolean thisSeqHasBeenClassified = false;
 
@@ -85,7 +102,6 @@ int freeRam() {
 
 void loop() {
   unsigned long startTime = millis();
-  byte tickMilliDelay = 25;
   //Serial.println(gyroX());
   // 1000/tickMilliDelay times per second, run this code
   // Make sure the code can run in less than 1000/tickMilliDelay seconds.
@@ -109,10 +125,13 @@ void loop() {
       return;
     }
     
-    accel_X[index] = gyroX();
-    accel_Y[index] = gyroY();
-    accel_Z[index] = gyroZ();
-
+    if (index == 0){
+      accel_Y[index] = gyroY() * dt;
+      accel_Z[index] = gyroZ() * dt;
+    } else {
+      accel_Y[index] = accel_Y[index - 1] + (gyroY() * dt);
+      accel_Z[index] = accel_Z[index - 1] + (gyroZ() * dt);
+    }
     
     Serial.print(accelX(), 6);
     Serial.print(" ");
@@ -140,17 +159,18 @@ void loop() {
       return;
     }
     
-    normalizeHeight(accel_X, accel_Y, accel_Z, index);
-    double* newX = normalizeLength(accel_X, trainedDataSize, index);
+    anglesToPos(accel_Y, index);
+    anglesToPos(accel_Z, index);
+    normalizeHeight(accel_Y, index);
+    normalizeHeight(accel_Z, index);
     double* newY = normalizeLength(accel_Y, trainedDataSize, index);
     double* newZ = normalizeLength(accel_Z, trainedDataSize, index);
     index = 0;
     
     // Classification is an int that's >= 0
-    int classification = classify(newX, newY, newZ);
+    int classification = classify(newY, newZ);
     
     /*
-    
     if (classification == 0) {
       BPMod.keyboardPress(BP_KEY_LEFT_ARROW, BP_MOD_NOMOD);
     }
@@ -160,7 +180,6 @@ void loop() {
     BPMod.keyboardReleaseAll();
     index*/
     
-    delete[] newX;
     delete[] newY;
     delete[] newZ;
     
@@ -171,18 +190,16 @@ void loop() {
     Serial.println();
     
     if (classification == 3){
-      sendConsumerKey(ZERO_HEX, NEXT_HIGH);
-     // sendConsumerKey(VOL_UP);
-      //sendConsumerKey(VOL_UP);
+//      sendConsumerKey(ZERO_HEX, NEXT_HIGH);
+
       return;
     } else if (classification == 2) {
-      sendConsumerKey(ZERO_HEX, PREV_HIGH);
-      //sendConsumerKey(VOL_DOWN);
-      //sendConsumerKey(VOL_DOWN);
+ //     sendConsumerKey(ZERO_HEX, PREV_HIGH);
+
       return;
     }
     
-    sendViaBluetooth(gestToKeyCodes[classification]);
+ //   sendViaBluetooth(gestToKeyCodes[classification]);
     
     Serial.println(freeRam());
   }
@@ -195,84 +212,86 @@ int pollTouchPad(){
 
 
 double* normalizeLength(double seq[], int desiredLength, int initialLength)
-{
-  //Serial.println("normLength");
+{ 
+  
+  Serial.println("1");
+  
+  Serial.println(freeRam());
   
   float* x = new float[initialLength];
   float* y = new float[initialLength];
-
+    Serial.println(initialLength);
    
   for (int i = 0; i < initialLength; i++)  {
     x[i] = i;
     y[i] = float(seq[i]);
   }
-  
+    Serial.println("2");
+
   Spline linearSpline(x,y,initialLength,1);
+    Serial.println("3");
+
   
-  delete[] x;
-  delete[] y;
   double* normalized = new double[desiredLength];
+  Serial.println("4");
 
   //normalized[desiredLength];
   double slope = double(initialLength)/(desiredLength-1);
-  //Serial.println(initialLength);
-  //Serial.println(desiredLength);
-
-  //Serial.println("find the slope");
+ 
   for (int i=0; i < desiredLength; i++)
   {
-    double xVal = i*slope;
+    double xVal = i * slope;
+    Serial.println(linearSpline.value(xVal));
     normalized[i] = linearSpline.value(xVal);
   }
-  //printArray(normalized, desiredLength);
-  //printArray(seq, initialLength);
-  //Serial.println("returning from norm length");
-  //printArray(normalized, desiredLength);
+    Serial.println("5");
+delete[] x;
+  delete[] y;
+
   return normalized;
 }
 
-void normalizeHeight(double* x, double* y, double* z, int seqSize){
-  //printArray(x, seqSize);
+void normalizeHeight(double* seq, int seqSize){
+  //printArray(seq, seqSize);
   
-  int maxI = 0;
   double maxVal = 0.0;
+  double minVal = 9999.9;
   
-  for (int d = 0; d < 3; d++){
-    for (int i = 0; i < seqSize; i++){
-      double val;
-      if (d == 0){
-        val = x[i];
-      } else if (d == 1){
-        val = y[i];
-      } else {
-        val = z[i];
-      }
-      
-      if (abs(val) > maxVal){
-        maxI = i;
-        maxVal = abs(val);
-      }
+  for (int i = 0; i < seqSize; i++){
+    double val = seq[i];
+    if (val > maxVal){
+      maxVal = val;
+    }
+    if (val < minVal){
+      minVal = val;
     }
   }
   
   //Serial.println("MAX:"); Serial.println(maxVal);
   
-  for (int i = 0; i < seqSize; i++){
-    //if (maxVal != 0.0) {
-      x[i] = x[i] / maxVal;
-      y[i] = y[i] / maxVal;
-      z[i] = z[i] / maxVal;
-    //}
+  for (int i = 0; i < seqSize; i++) {
+     seq[i]  = (seq[i] - minVal) / (maxVal - minVal);
   }
 }
 
-int classify(double* gestureX, double* gestureY, double* gestureZ){
+
+
+
+void anglesToPos(double* seq, int seqSize){
+  
+  for (int i = 0; i < seqSize; i++) {
+    seq[i] = sin(seq[i] * (PI / 180.0)) * 10.0;
+  }
+  printArray(seq, seqSize);
+}
+
+int classify(double* gestureY, double* gestureZ){
   //printArray(gestureZ, trainedDataSize);
   double minLoss = 999999;
   int bestGesture = 0;
   
   for (int i = 0; i < numTrainingSamples; i++){
-    double loss = squaredLossDifference(gestureX, trainingX[i], trainedDataSize);
+    double loss = 0.0;
     loss += squaredLossDifference(gestureY, trainingY[i], trainedDataSize);
     loss += squaredLossDifference(gestureZ, trainingZ[i], trainedDataSize);
     //Serial.print("Class: "); Serial.print(i); Serial.print(" - loss: "); Serial.println(loss);
@@ -301,7 +320,7 @@ double squaredLossDifference(double a[], const double b[], int dataSize){
 
 void printArray(double* a, int length){
   for (int i = 0; i < length; i++){
-    Serial.print(a[i]);
+    Serial.print(a[i], 4);
     Serial.print(", ");
   }
   Serial.println();
@@ -314,7 +333,7 @@ double* lastMags = new double[qSize];
 int front = 0;
 
 boolean gestTakingPlace(int maxGestureSize){
-  double thresh = 65.0;
+  double thresh = 50.0;
   
   // current mag
   double magnitude = sqrt(gyroX() * gyroX()) + (gyroY() * gyroY()) + (gyroZ() * gyroZ());
@@ -335,7 +354,7 @@ boolean gestTakingPlace(int maxGestureSize){
   //if (avgMag > thresh) Serial.println(avgMag);
   return avgMag > thresh;
 }
-
+/*
 void sendViaBluetooth(byte b){
   sendViaBluetoothRaw(b);
   releaseKeys();
@@ -376,3 +395,4 @@ void sendConsumerKey(byte low, byte high){
 void releaseKeys(){
   sendViaBluetoothRaw(0x00);
 }
+*/
