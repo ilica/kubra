@@ -1,4 +1,4 @@
-function plot_accel
+function [z_pos x_pos z_raw x_raw] = plot_accel
     Y = [0.039307 -0.406738 0.061035 18.483999 8.956001 1.700000
     -0.054932 -0.410156 0.062744 25.336000 10.276000 4.192000
     -0.332764 -0.485107 0.045654 47.768001 9.512001 20.455999
@@ -48,6 +48,8 @@ function plot_accel
     dt = 0.025;
     finger_length = 10;
 
+  
+    
     function [x_int y_int] = position_from_accel(y_accel)
         data_length = length(y_accel);
         x = 1:data_length;
@@ -67,28 +69,23 @@ function plot_accel
     end
 
     function [y] = gyro_int(gyro)
-        y = cumsum(gyro * dt);
+        y = cumsum(gyro * dt)
     end
 
     function pos_at_time = position_from_gyro(gyro)
-        radians_at_time = gyro_int(gyro) * (pi / 180)
+        radians_at_time = gyro_int(gyro) * (pi / 180);
         pos_at_time = sin(radians_at_time) * finger_length;
     end
-
-    %[~, x_pos] = linear_position_from_accel(Y(:, 1)');
-    %[~, y_pos] = linear_position_from_accel(Y(:, 2)');
-    %[~, z_pos] = linear_position_from_accel(Y(:, 3)');
+    x_raw = gyro_int(Y(:, 4));
+    z_raw = gyro_int(Y(:, 6));
     
-    %z_pos'
-
-    x_pos = position_from_gyro(Y(:, 4));
-    y_pos = position_from_gyro(Y(:, 5));
-    z_pos = position_from_gyro(Y(:, 6));
+    x_pos = position_from_gyro(Y(:, 4))
+    %y_pos = position_from_gyro(Y(:, 5));
+    z_pos = position_from_gyro(Y(:, 6))
     
     for i = 1:length(z_pos)
         plotted = plot(-z_pos(1:i), x_pos(1:i), 'o');
         axis([-3 3 -3 3]);
-
         
         set(gcf, 'color', [0 0 0]);
         set(gca, 'color', [0 0 0]);
