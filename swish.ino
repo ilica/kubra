@@ -17,7 +17,6 @@ const byte PREV_HIGH = 0x04;
 const byte tickMilliDelay = 25;
 double dt = ((double)tickMilliDelay) / 1000.0;
 
-
 int potentiometerPin = A0;
 byte loopDelay = 100;
 //arrays fixed size so we need to determine the maximum size a gesture can be: 10*100=1000ms=1s long gesture
@@ -34,20 +33,38 @@ int index = 0;
 const byte trainedDataSize = 10;
 const int minGestSize = 10;
 
-const byte numTrainingSamples = 4;
+const byte numTrainingSamples = 5;
 
-int gestToKeyCodes[numTrainingSamples] = {ARROW_LEFT, ARROW_RIGHT, ARROW_DOWN, ARROW_UP};
+//int gestToKeyCodes[numTrainingSamples] = {ARROW_LEFT, ARROW_RIGHT, ARROW_DOWN, ARROW_UP};
 
 // THIS HOLDS RAW TRAINING DATA
 
 const byte maxRawTrainingSize = 30;
 
+const double leftX[trainedDataSize] = {0};
+const double leftY[trainedDataSize] = {0};
+const double leftZ[trainedDataSize] = {0.0336, 0.2045, 0.6286, 0.9619, 0.9862, 0.8043, 0.4193, 0.0950, 0.0127, 0.0000};
 
+const double rightX[trainedDataSize] = {0};
+const double rightY[trainedDataSize] = {0};
+const double rightZ[trainedDataSize] = {0.9822, 0.6468, 0.1910, 0.0161, 0.0360, 0.2549, 0.6604, 0.8243, 0.8694, 0.8743};
+
+const double sX[trainedDataSize] = {0.9133, 0.9722, 0.6606, 0.3025, 0.3879, 0.2501, 0.0044, 0.0255, 0.0958, 0.1640};
+const double sY[trainedDataSize] = {0};
+const double sZ[trainedDataSize] = {0.1932, 0.5755, 0.8288, 0.6974, 0.2284, 0.0000, 0.1786, 0.6408, 0.9805, 0.9675};
+
+const double nX[trainedDataSize] = {0.2911, 0.7331, 0.9858, 0.8284, 0.3479, 0.0458, 0.2197, 0.6647, 0.8080, 0.7945};
+const double nY[trainedDataSize] = {0};
+const double nZ[trainedDataSize] = {0.5932, 0.7941, 0.9838, 0.7982, 0.2894, 0.0232, 0.1096, 0.2683, 0.3688, 0.3762};
+
+const double uX[trainedDataSize] = {0.8500, 0.6951, 0.4371, 0.1182, 0.0211, 0.2353, 0.6413, 0.9240, 0.9995, 0.9896};
+const double uY[trainedDataSize] = {0};
+const double uZ[trainedDataSize] = {1.0000, 0.9717, 0.9145, 0.6604, 0.4331, 0.0711, 0.0801, 0.2471, 0.3774, 0.3925};
 
 // THIS HOLDS PROCESSED TRAINING DATA
-const double* trainingX[numTrainingSamples] = {};
-const double* trainingY[numTrainingSamples] = {};
-const double* trainingZ[numTrainingSamples] = {};
+const double* trainingX[numTrainingSamples] = {leftX, rightX, sX, nX, uX};
+const double* trainingY[numTrainingSamples] = {leftY, rightY, sY, nY, uY};
+const double* trainingZ[numTrainingSamples] = {leftZ, rightZ, sZ, nZ, uZ};
 
 void setup() {
   Serial.begin(9600);
@@ -60,12 +77,12 @@ void setup() {
   Serial.println("All setup!");
 
   //double gestY[trainedDataSize] = {0.10, 0.83, 0.95, 0.20, -0.69, -1.00, -0.29, -0.02, 0.01, 0.02};
-
-  double rawSSwipeZ[45] = {18.483999, 25.336, 47.768001, 66.419998, 51.172, 25.555999, -0.768, -8.420001, -8.82, -17.299999, -35.04, -41.736, -34.448001, -35.944, -41.84, -33.495998, -28.239999, -30.559999, -29.576, -36.027999, -37.291999, -51.368, -64.484001, -42.527999, -47.063999, -43.872001, -55.655998, -33.659999, -28.992, -31.808, -40.776, -26.267999, -14.936, 7.832, 25.587999, 32.195999, 41.335998, 43.212001, 47.875999, 56.144001, 40.763999, 34.835998, 19.107999, 16.767999, 7.532};
+  /*
+  double rawSSwipeZ[45] = {8.956001, 10.276, 9.512001, 0.176, -1.452, -4.96, -15.288001, -10.936, -10.136, -13.300001, -22.1, -30.652, -7.864, -5.812, -20.524, -17.691999, 1.284, -0.744, 4.556, 9.08, 5.524, -12.552, -18.52, 10.272001, -6.224, -4.772, -15.808, -3.492, -8.5, -15.268, -13.676, -0.344, -0.676, 0.012, 2.672, 3.212, -2.656, 4.172, 5.408, 6.216, 3.1, 6.74, -0.372, 5.676, 3.724};
   //double rawSSwipeZ[45] = {1.7, 4.192, 20.455999, 42.155998, 48.720001, 38.448001, 29.36, 18.752, 18.931999, 19.856, 15.484001, 6.168, 4.808, -4.012, -22.827999, -37.287998, -41.591999, -43.268001, -33.063999, -34.555999, -36.551998, -36.956001, -30.395999, -13.592, -9.384, -1.636, 4.564, 11.812001, 16.403999, 17.04, 22.076, 32.291999, 42.551998, 45.372001, 38.423999, 27.591999, 20.219999, 24.423999, 29.643999, 37.363998, 25.908, 7.936, -6.74, -5.56, -0.9};
  
   for (int i = 0; i < 45; i++){
-    // rawSSwipeX[i] = rawSSwipeX[i] * dt;
+     // rawSSwipeX[i] = rawSSwipeX[i] * dt;
      rawSSwipeZ[i] = rawSSwipeZ[i] * dt;
   }  
   
@@ -85,7 +102,7 @@ void setup() {
   
   //printArray(newY, 10);
   printArray(newZ, 10);
-  
+  */
   Serial.println(freeRam());
 }
 
@@ -100,6 +117,12 @@ int freeRam() {
 }
 
 
+const byte buttonQSize = 4;
+int* lastButtons = new int[buttonQSize];
+int buttonQFront = 0;
+
+
+
 void loop() {
   unsigned long startTime = millis();
   //Serial.println(gyroX());
@@ -110,8 +133,20 @@ void loop() {
   //Serial.println("AFTER");
   int maxGestureSize = 1000 / tickMilliDelay;
   
+  int currentVal = digitalRead(capTouchSensor);
   
-  if (digitalRead(capTouchSensor) == LOW) {
+  
+   lastButtons[buttonQFront] = currentVal;
+   buttonQFront++;
+  if (buttonQFront == buttonQSize) buttonQFront = 0;
+  
+  double sum = 0.0;
+  for (int i = 0; i < buttonQSize; i++){
+    sum += lastButtons[i];
+  }
+  
+  
+  if ((sum / buttonQSize) < 0.3) {
     index = 0;
     return;
   }
@@ -126,10 +161,10 @@ void loop() {
     }
     
     if (index == 0){
-      accel_Y[index] = gyroY() * dt;
+      accel_X[index] = gyroX() * dt;
       accel_Z[index] = gyroZ() * dt;
     } else {
-      accel_Y[index] = accel_Y[index - 1] + (gyroY() * dt);
+      accel_X[index] = accel_X[index - 1] + (gyroX() * dt);
       accel_Z[index] = accel_Z[index - 1] + (gyroZ() * dt);
     }
     
@@ -154,21 +189,28 @@ void loop() {
     thisSeqHasBeenClassified = true;
     
     if (index < minGestSize){
+      Serial.println(index);
       Serial.println();
       index = 0;
       return;
     }
     
-    anglesToPos(accel_Y, index);
+    anglesToPos(accel_X, index);
     anglesToPos(accel_Z, index);
-    normalizeHeight(accel_Y, index);
+    
+    normalizeHeight(accel_X, index);
     normalizeHeight(accel_Z, index);
-    double* newY = normalizeLength(accel_Y, trainedDataSize, index);
+    
+    double* newX = normalizeLength(accel_X, trainedDataSize, index);
     double* newZ = normalizeLength(accel_Z, trainedDataSize, index);
+    
+    printArray(newX, 10);
+    printArray(newZ, 10);
+    
     index = 0;
     
     // Classification is an int that's >= 0
-    int classification = classify(newY, newZ);
+    int classification = classify(newX, newZ);
     
     /*
     if (classification == 0) {
@@ -178,9 +220,10 @@ void loop() {
       BPMod.keyboardPress(BP_KEY_RIGHT_ARROW, BP_MOD_NOMOD);
     }
     BPMod.keyboardReleaseAll();
-    index*/
+    index
+    */
     
-    delete[] newY;
+    delete[] newX;
     delete[] newZ;
     
     //printArray(posX, index);
@@ -189,13 +232,20 @@ void loop() {
     Serial.println(classification);
     Serial.println();
     
-    if (classification == 3){
-//      sendConsumerKey(ZERO_HEX, NEXT_HIGH);
-
+    if (classification == 0){
+      sendViaBluetooth(ARROW_LEFT);
       return;
-    } else if (classification == 2) {
- //     sendConsumerKey(ZERO_HEX, PREV_HIGH);
-
+    } else if (classification == 1) {
+      sendViaBluetooth(ARROW_RIGHT);
+      return;
+    } else if (classification == 2){
+      Serial1.write("s");
+      return;
+    } else if (classification == 3){
+      Serial1.write("n");
+      return; 
+    } else if (classification == 4){
+      Serial1.write("u");
       return;
     }
     
@@ -215,27 +265,21 @@ double* normalizeLength(double seq[], int desiredLength, int initialLength)
 { 
   
   Serial.println("1");
-  
   Serial.println(freeRam());
   
   float* x = new float[initialLength];
   float* y = new float[initialLength];
-    Serial.println(initialLength);
+  Serial.println(initialLength);
    
   for (int i = 0; i < initialLength; i++)  {
     x[i] = i;
     y[i] = float(seq[i]);
   }
-    Serial.println("2");
 
   Spline linearSpline(x,y,initialLength,1);
-    Serial.println("3");
-
   
   double* normalized = new double[desiredLength];
-  Serial.println("4");
 
-  //normalized[desiredLength];
   double slope = double(initialLength)/(desiredLength-1);
  
   for (int i=0; i < desiredLength; i++)
@@ -244,8 +288,8 @@ double* normalizeLength(double seq[], int desiredLength, int initialLength)
     Serial.println(linearSpline.value(xVal));
     normalized[i] = linearSpline.value(xVal);
   }
-    Serial.println("5");
-delete[] x;
+
+  delete[] x;
   delete[] y;
 
   return normalized;
@@ -274,15 +318,10 @@ void normalizeHeight(double* seq, int seqSize){
   }
 }
 
-
-
-
 void anglesToPos(double* seq, int seqSize){
-  
   for (int i = 0; i < seqSize; i++) {
     seq[i] = sin(seq[i] * (PI / 180.0)) * 10.0;
   }
-  printArray(seq, seqSize);
 }
 
 int classify(double* gestureY, double* gestureZ){
@@ -294,7 +333,10 @@ int classify(double* gestureY, double* gestureZ){
     double loss = 0.0;
     loss += squaredLossDifference(gestureY, trainingY[i], trainedDataSize);
     loss += squaredLossDifference(gestureZ, trainingZ[i], trainedDataSize);
-    //Serial.print("Class: "); Serial.print(i); Serial.print(" - loss: "); Serial.println(loss);
+    
+    if (trainingY[i][0] == 0.0) loss = loss / 2;
+    
+    Serial.print("Class: "); Serial.print(i); Serial.print(" - loss: "); Serial.println(loss);
     if (loss < minLoss){
       minLoss = loss;
       bestGesture = i;
@@ -306,14 +348,17 @@ int classify(double* gestureY, double* gestureZ){
 
 double squaredLossDifference(double a[], const double b[], int dataSize){
   double sum = 0;
-  
+    
   for (int i = 0; i < dataSize; i++){
-    if (a[i] == 0.0 || b[i] == 0.0) continue;
+    if (a[i] == 0.0 || b[i] == 0.0) {
+      continue;
+    }
     //Serial.println(a[i]);
     sum += (a[i] - b[i]) * (a[i] - b[i]);
   }
   
   //Serial.println(sum);
+    
   return sum;
 }
 
@@ -354,9 +399,10 @@ boolean gestTakingPlace(int maxGestureSize){
   //if (avgMag > thresh) Serial.println(avgMag);
   return avgMag > thresh;
 }
-/*
+
 void sendViaBluetooth(byte b){
   sendViaBluetoothRaw(b);
+  delay(10);
   releaseKeys();
 }
 
@@ -395,4 +441,4 @@ void sendConsumerKey(byte low, byte high){
 void releaseKeys(){
   sendViaBluetoothRaw(0x00);
 }
-*/
+
