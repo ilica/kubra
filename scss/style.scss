@@ -1,0 +1,130 @@
+// The stuff that can't be changed in _settings.scss
+
+
+// MY VARIABLES
+$kubraGreen: rgb(134, 205, 77);
+$kubraGray: rgb(30,30,30);
+
+
+body {
+    
+    // ****** NOTE: In the future, serve different sized images for different screen sies ******
+    background-image: url('../images/black_pattern02_bw.jpg') !important;
+    //background: rgb(30,30,30) !important;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    overflow: hidden;
+}
+
+.greenborder {
+    border-color: $kubraGreen;
+}
+
+.LogoDiv {
+    margin-top: 15vh; // 15% of vertical height http://stanislav.it/how-to-make-div-element-100-height-of-browser-window-using-css-only/
+    text-align: center;
+    vertical-align: middle;
+}
+
+
+#Logo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    height: 70%; 
+}
+
+#content {
+    opacity: 1.0;
+    transition: 1s;
+}
+
+
+.center {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#nav {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    
+    li {
+        display: inline;
+    }
+    
+    a {
+        display: inline-block;
+        padding: 10px;
+    }
+}
+    
+    
+a {
+    color: $kubraGreen;
+    text-decoration: none;
+    font-weight: 100;
+    font-size: 20px;
+    transition: 0.2s;
+}
+a:hover {
+    color: white;
+}
+
+
+
+.circleBase {
+    border-radius: 50%;
+    behavior: url(PIE.htc); /* remove if you don't care about IE8 */
+}
+
+.type1 {
+    width: 15px;
+    height: 15px;
+    //background: #ccc;
+    //border: 3px solid #000;
+    
+    // Radial gradient fill
+    background: -webkit-radial-gradient(circle, white 1%, rgba(255,255,255,0.5) 30%, rgba(255,255,255,0) 60%); /* Safari 5.1 to 6.0 */
+    background: -o-radial-gradient(circle, white 1%, rgba(255,255,255,0.5) 30%, rgba(255,255,255,0) 60%); /* For Opera 11.6 to 12.0 */
+    background: -moz-radial-gradient(circle, white 1%, rgba(255,255,255,0.5) 30%, rgba(255,255,255,0) 60%); /* For Firefox 3.6 to 15 */
+    background: radial-gradient(circle, white 1%, rgba(255,255,255,0.5) 30%, rgba(255,255,255,0) 60%); /* Standard syntax (must be last) */
+}
+
+.line-linkage {
+    width: 85%;
+    height: 0px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    position: relative;
+    top: 7px;
+    left: 57%;
+}
+
+.ft {
+    width: 100%;
+    display: inline-block;
+    padding: 0px;
+    font-size: 20px;
+    font-weight: 100;
+    color: $kubraGreen;
+    transition: 0.3s;
+}
+
+.ft:hover {
+    color: white;
+}
+
+#navtable {
+    background: none;
+    border: none;
+    width: 70%;
+    margin-left: 15%;
+    margin-right: 15%;
+}
+
+#navcontainer {
+
+}

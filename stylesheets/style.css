@@ -1,0 +1,127 @@
+/* line 9, ../scss/style.scss */
+body {
+  background-image: url("../images/black_pattern02_bw.jpg") !important;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  overflow: hidden;
+}
+
+/* line 20, ../scss/style.scss */
+.greenborder {
+  border-color: #86cd4d;
+}
+
+/* line 24, ../scss/style.scss */
+.LogoDiv {
+  margin-top: 15vh;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* line 31, ../scss/style.scss */
+#Logo {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  height: 70%;
+}
+
+/* line 38, ../scss/style.scss */
+#content {
+  opacity: 1.0;
+  transition: 1s;
+}
+
+/* line 44, ../scss/style.scss */
+.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* line 49, ../scss/style.scss */
+#nav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+/* line 55, ../scss/style.scss */
+#nav li {
+  display: inline;
+}
+/* line 59, ../scss/style.scss */
+#nav a {
+  display: inline-block;
+  padding: 10px;
+}
+
+/* line 66, ../scss/style.scss */
+a {
+  color: #86cd4d;
+  text-decoration: none;
+  font-weight: 100;
+  font-size: 20px;
+  transition: 0.2s;
+}
+
+/* line 73, ../scss/style.scss */
+a:hover {
+  color: white;
+}
+
+/* line 79, ../scss/style.scss */
+.circleBase {
+  border-radius: 50%;
+  behavior: url(PIE.htc);
+  /* remove if you don't care about IE8 */
+}
+
+/* line 84, ../scss/style.scss */
+.type1 {
+  width: 15px;
+  height: 15px;
+  background: -webkit-radial-gradient(circle, white 1%, rgba(255, 255, 255, 0.5) 30%, rgba(255, 255, 255, 0) 60%);
+  /* Safari 5.1 to 6.0 */
+  background: -o-radial-gradient(circle, white 1%, rgba(255, 255, 255, 0.5) 30%, rgba(255, 255, 255, 0) 60%);
+  /* For Opera 11.6 to 12.0 */
+  background: -moz-radial-gradient(circle, white 1%, rgba(255, 255, 255, 0.5) 30%, rgba(255, 255, 255, 0) 60%);
+  /* For Firefox 3.6 to 15 */
+  background: radial-gradient(circle, #ffffff 1%, rgba(255, 255, 255, 0.5) 30%, rgba(255, 255, 255, 0) 60%);
+  /* Standard syntax (must be last) */
+}
+
+/* line 97, ../scss/style.scss */
+.line-linkage {
+  width: 85%;
+  height: 0px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  top: 7px;
+  left: 57%;
+}
+
+/* line 106, ../scss/style.scss */
+.ft {
+  width: 100%;
+  display: inline-block;
+  padding: 0px;
+  font-size: 20px;
+  font-weight: 100;
+  color: #86cd4d;
+  transition: 0.3s;
+}
+
+/* line 116, ../scss/style.scss */
+.ft:hover {
+  color: white;
+}
+
+/* line 120, ../scss/style.scss */
+#navtable {
+  background: none;
+  border: none;
+  width: 70%;
+  margin-left: 15%;
+  margin-right: 15%;
+}
