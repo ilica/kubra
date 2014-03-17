@@ -4,9 +4,13 @@
 
 $(document).foundation();
 
-
-console.log("HELLO");
-
-$("#content").click( function() {
+$("#content").click(function() {
     $('#myModal').foundation('reveal', 'open');
 });
+
+$('#Logo').hide();
+
+$(document).ready( function() {
+  $('#Logo').fadeIn(4000);
+});
+
