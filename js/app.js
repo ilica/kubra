@@ -3,6 +3,9 @@
 
 $(document).foundation();
 
+
 $("#content").click(function() {
-    $('#myModal').foundation('reveal', 'open');
+    var modal = $('#myModal');
+    modal.foundation('reveal', 'open');
+    modal.css('width', $('body').width());
 });

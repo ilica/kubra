@@ -6226,7 +6226,7 @@ dialog > :last-child, .reveal-modal > :last-child {
 @media only screen and (min-width: 40.063em) {
   /* line 158, ../bower_components/foundation/scss/foundation/components/_reveal.scss */
   dialog, .reveal-modal {
-    top: 15vh;
+    top: 0px;
   }
 }
 /* line 162, ../bower_components/foundation/scss/foundation/components/_reveal.scss */
@@ -6264,7 +6264,7 @@ dialog[open] {
 @media only screen and (min-width: 40.063em) and (min-width: 40.063em) {
   /* line 172, ../bower_components/foundation/scss/foundation/components/_reveal.scss */
   dialog, .reveal-modal {
-    top: 15vh;
+    top: 0px;
   }
 }
 @media only screen and (min-width: 40.063em) and (min-width: 40.063em) {
