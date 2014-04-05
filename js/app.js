@@ -8,4 +8,5 @@ $("#content").click(function() {
     var modal = $('#myModal');
     modal.foundation('reveal', 'open');
     modal.css('width', $('body').width());
+    draw();
 });
