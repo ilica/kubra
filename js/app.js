@@ -4,9 +4,16 @@
 $(document).foundation();
 
 
-$("#content").click(function() {
-    var modal = $('#myModal');
+$("#whatItIsButton").click(function() {
+    var modal = $('#whatItIs');
     modal.foundation('reveal', 'open');
     modal.css('width', $('body').width());
     draw();
 });
+
+$("#howItWorksButton").click(function() {
+    var modal = $('#howItWorks');
+    modal.foundation('reveal', 'open');
+    modal.css('width', $('body').width());
+});
+

@@ -17,20 +17,21 @@ body {
 /* line 23, ../scss/style.scss */
 p {
   font-weight: 100 !important;
+  letter-spacing: 1px;
 }
 
-/* line 28, ../scss/style.scss */
+/* line 29, ../scss/style.scss */
 .greenborder {
   border-color: #86cd4d;
 }
 
-/* line 31, ../scss/style.scss */
+/* line 32, ../scss/style.scss */
 .LogoDiv {
   margin-top: 15vh;
   vertical-align: middle;
 }
 
-/* line 36, ../scss/style.scss */
+/* line 37, ../scss/style.scss */
 #Logo {
   display: block;
   margin-left: auto;
@@ -38,36 +39,36 @@ p {
   height: 70%;
 }
 
-/* line 42, ../scss/style.scss */
+/* line 43, ../scss/style.scss */
 #content {
   opacity: 1.0;
   transition: 1s;
 }
 
-/* line 46, ../scss/style.scss */
+/* line 47, ../scss/style.scss */
 .center {
   margin-left: auto;
   margin-right: auto;
 }
 
-/* line 50, ../scss/style.scss */
+/* line 51, ../scss/style.scss */
 #nav {
   list-style: none;
   margin: 0;
   padding: 0;
   text-align: center;
 }
-/* line 55, ../scss/style.scss */
+/* line 56, ../scss/style.scss */
 #nav li {
   display: inline;
 }
-/* line 58, ../scss/style.scss */
+/* line 59, ../scss/style.scss */
 #nav a {
   display: inline-block;
   padding: 10px;
 }
 
-/* line 63, ../scss/style.scss */
+/* line 64, ../scss/style.scss */
 a {
   color: #86cd4d;
   text-decoration: none;
@@ -76,19 +77,19 @@ a {
   transition: 0.2s;
 }
 
-/* line 71, ../scss/style.scss */
+/* line 72, ../scss/style.scss */
 a:hover {
   color: white;
 }
 
-/* line 75, ../scss/style.scss */
+/* line 76, ../scss/style.scss */
 .circleBase {
   border-radius: 50%;
   behavior: url(PIE.htc);
   /* remove if you don't care about IE8 */
 }
 
-/* line 80, ../scss/style.scss */
+/* line 81, ../scss/style.scss */
 .type1 {
   width: 15px;
   height: 15px;
@@ -101,17 +102,17 @@ a:hover {
   /* Standard syntax (must be last) */
 }
 
-/* line 94, ../scss/style.scss */
+/* line 95, ../scss/style.scss */
 .line-linkage {
   width: 85%;
   height: 0px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
   top: 7px;
-  left: 57%;
+  left: 55%;
 }
 
-/* line 102, ../scss/style.scss */
+/* line 103, ../scss/style.scss */
 .ft {
   width: 100%;
   display: inline-block;
@@ -122,12 +123,12 @@ a:hover {
   transition: 0.3s;
 }
 
-/* line 111, ../scss/style.scss */
+/* line 112, ../scss/style.scss */
 .ft:hover {
   color: white;
 }
 
-/* line 114, ../scss/style.scss */
+/* line 115, ../scss/style.scss */
 #navtable {
   background: none;
   border: none;
@@ -136,7 +137,7 @@ a:hover {
   margin-right: 15%;
 }
 
-/* line 126, ../scss/style.scss */
+/* line 127, ../scss/style.scss */
 .full-modal {
   background-size: 100% 100% !important;
   background-repeat: no-repeat !important;
@@ -149,7 +150,7 @@ a:hover {
   overflow: auto;
 }
 
-/* line 138, ../scss/style.scss */
+/* line 139, ../scss/style.scss */
 .close-full-modal {
   position: fixed !important;
   top: 5px !important;
