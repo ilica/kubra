@@ -137,7 +137,17 @@ a:hover {
   margin-right: 15%;
 }
 
-/* line 127, ../scss/style.scss */
+/* line 125, ../scss/style.scss */
+.align-right {
+  text-align: right;
+}
+
+/* line 129, ../scss/style.scss */
+.align-center {
+  text-align: center;
+}
+
+/* line 136, ../scss/style.scss */
 .full-modal {
   background-size: 100% 100% !important;
   background-repeat: no-repeat !important;
@@ -150,7 +160,7 @@ a:hover {
   overflow: auto;
 }
 
-/* line 139, ../scss/style.scss */
+/* line 148, ../scss/style.scss */
 .close-full-modal {
   position: fixed !important;
   top: 5px !important;

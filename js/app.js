@@ -17,3 +17,13 @@ $("#howItWorksButton").click(function() {
     modal.css('width', $('body').width());
 });
 
+$("#whosBehindItButton").click(function() {
+    var modal = $('#whosBehindIt');
+    modal.foundation('reveal', 'open');
+    modal.css('width', $('body').width());
+});
+
+
+$(".full-modal").click(function() {
+    $(this).foundation('reveal', 'close');
+});
