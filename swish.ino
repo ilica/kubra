@@ -33,7 +33,7 @@ int index = 0;
 const byte trainedDataSize = 10;
 const int minGestSize = 10;
 
-const byte numTrainingSamples = 5;
+const byte numTrainingSamples = 3;
 
 //int gestToKeyCodes[numTrainingSamples] = {ARROW_LEFT, ARROW_RIGHT, ARROW_DOWN, ARROW_UP};
 
@@ -53,18 +53,10 @@ const double sX[trainedDataSize] = {0.9133, 0.9722, 0.6606, 0.3025, 0.3879, 0.25
 const double sY[trainedDataSize] = {0};
 const double sZ[trainedDataSize] = {0.1932, 0.5755, 0.8288, 0.6974, 0.2284, 0.0000, 0.1786, 0.6408, 0.9805, 0.9675};
 
-const double nX[trainedDataSize] = {0.2911, 0.7331, 0.9858, 0.8284, 0.3479, 0.0458, 0.2197, 0.6647, 0.8080, 0.7945};
-const double nY[trainedDataSize] = {0};
-const double nZ[trainedDataSize] = {0.5932, 0.7941, 0.9838, 0.7982, 0.2894, 0.0232, 0.1096, 0.2683, 0.3688, 0.3762};
-
-const double uX[trainedDataSize] = {0.8500, 0.6951, 0.4371, 0.1182, 0.0211, 0.2353, 0.6413, 0.9240, 0.9995, 0.9896};
-const double uY[trainedDataSize] = {0};
-const double uZ[trainedDataSize] = {1.0000, 0.9717, 0.9145, 0.6604, 0.4331, 0.0711, 0.0801, 0.2471, 0.3774, 0.3925};
-
 // THIS HOLDS PROCESSED TRAINING DATA
-const double* trainingX[numTrainingSamples] = {leftX, rightX, sX, nX, uX};
-const double* trainingY[numTrainingSamples] = {leftY, rightY, sY, nY, uY};
-const double* trainingZ[numTrainingSamples] = {leftZ, rightZ, sZ, nZ, uZ};
+const double* trainingX[numTrainingSamples] = {leftX, rightX, sX};
+const double* trainingY[numTrainingSamples] = {leftY, rightY, sY};
+const double* trainingZ[numTrainingSamples] = {leftZ, rightZ, sZ};
 
 void setup() {
   Serial.begin(9600);
@@ -103,23 +95,13 @@ void setup() {
   //printArray(newY, 10);
   printArray(newZ, 10);
   */
-  Serial.println(freeRam());
 }
 
 
 
 boolean thisSeqHasBeenClassified = false;
 
-int freeRam() {
-  extern int __heap_start, *__brkval;
-  int v;
-  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
-}
 
-
-const byte buttonQSize = 4;
-int* lastButtons = new int[buttonQSize];
-int buttonQFront = 0;
 
 
 
@@ -128,29 +110,13 @@ void loop() {
   //Serial.println(gyroX());
   // 1000/tickMilliDelay times per second, run this code
   // Make sure the code can run in less than 1000/tickMilliDelay seconds.
-  
   pollMPU(); 
+
   //Serial.println("AFTER");
   int maxGestureSize = 1000 / tickMilliDelay;
+   
   
-  int currentVal = digitalRead(capTouchSensor);
-  
-  
-   lastButtons[buttonQFront] = currentVal;
-   buttonQFront++;
-  if (buttonQFront == buttonQSize) buttonQFront = 0;
-  
-  double sum = 0.0;
-  for (int i = 0; i < buttonQSize; i++){
-    sum += lastButtons[i];
-  }
-  
-  
-  if ((sum / buttonQSize) < 0.3) {
-    index = 0;
-    return;
-  }
-  
+
   if (gestTakingPlace(maxGestureSize))
   {
     thisSeqHasBeenClassified = false;
@@ -182,8 +148,9 @@ void loop() {
     Serial.println();
     
     index++;
-
+   
     delay(tickMilliDelay-(millis()-startTime));
+    
   } else if (!thisSeqHasBeenClassified) {
     
     thisSeqHasBeenClassified = true;
@@ -212,16 +179,6 @@ void loop() {
     // Classification is an int that's >= 0
     int classification = classify(newX, newZ);
     
-    /*
-    if (classification == 0) {
-      BPMod.keyboardPress(BP_KEY_LEFT_ARROW, BP_MOD_NOMOD);
-    }
-    else if (classification == 1) {
-      BPMod.keyboardPress(BP_KEY_RIGHT_ARROW, BP_MOD_NOMOD);
-    }
-    BPMod.keyboardReleaseAll();
-    index
-    */
     
     delete[] newX;
     delete[] newZ;
@@ -239,7 +196,8 @@ void loop() {
       sendViaBluetooth(ARROW_RIGHT);
       return;
     } else if (classification == 2){
-      Serial1.write("s");
+      // put password here!!
+      Serial1.println("0ma0414docz");
       return;
     } else if (classification == 3){
       Serial1.write("n");
@@ -248,10 +206,7 @@ void loop() {
       Serial1.write("u");
       return;
     }
-    
- //   sendViaBluetooth(gestToKeyCodes[classification]);
-    
-    Serial.println(freeRam());
+        
   }
 }
 
@@ -264,8 +219,6 @@ int pollTouchPad(){
 double* normalizeLength(double seq[], int desiredLength, int initialLength)
 { 
   
-  Serial.println("1");
-  Serial.println(freeRam());
   
   float* x = new float[initialLength];
   float* y = new float[initialLength];
@@ -379,15 +332,18 @@ int front = 0;
 
 boolean gestTakingPlace(int maxGestureSize){
   double thresh = 50.0;
-  
   // current mag
   double magnitude = sqrt(gyroX() * gyroX()) + (gyroY() * gyroY()) + (gyroZ() * gyroZ());
   
   // push it on the to queue, and pop and releast the front
   //Serial.println(front);
+  
+
   lastMags[front] = magnitude;
   front++;
   if (front == qSize) front = 0;
+  
+  
   
   double sum = 0.0;
   for (int i = 0; i < qSize; i++){

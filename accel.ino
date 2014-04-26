@@ -637,8 +637,9 @@ void setupMPU()
   //    Clock source at internal 8MHz
   //    The device is in sleep mode.
   //
-
+  Serial.println("about to read");
   error = MPU6050_read(MPU6050_WHO_AM_I, &c, 1);
+  Serial.println("did the read");
   Serial.print(F("WHO_AM_I : "));
   Serial.print(c,HEX);
   Serial.print(F(", error = "));
@@ -723,25 +724,24 @@ double gyroZ(){
 int MPU6050_read(int start, uint8_t *buffer, int size)
 {
   int i, n, error;
-
   Wire.beginTransmission(MPU6050_I2C_ADDRESS);
-  //Serial.println("writing");
+
   n = Wire.write(start);
   if (n != 1)
     return (-10);
-  //Serial.println("ending");
 
   n = Wire.endTransmission(false);    // hold the I2C-bus
+
   if (n != 0)
     return (n);
-  //Serial.println("requesting");
+    
 
 
   // Third parameter is true: relase I2C-bus after data is read.
   Wire.requestFrom(MPU6050_I2C_ADDRESS, size, true);
   i = 0;
-  //Serial.println("Available");
-
+  
+ 
   while(Wire.available() && i<size)
   {
     buffer[i++]=Wire.read();
