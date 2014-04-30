@@ -102,19 +102,41 @@ void setup() {
 boolean thisSeqHasBeenClassified = false;
 
 
-
+const byte buttonQSize = 4;
+int* lastButtons = new int[buttonQSize];
+int buttonQFront = 0;
 
 
 void loop() {
+ // Serial.println("loop");
   unsigned long startTime = millis();
   //Serial.println(gyroX());
   // 1000/tickMilliDelay times per second, run this code
   // Make sure the code can run in less than 1000/tickMilliDelay seconds.
-  pollMPU(); 
+  pollMPU();
 
   //Serial.println("AFTER");
   int maxGestureSize = 1000 / tickMilliDelay;
    
+   
+  int currentVal = digitalRead(capTouchSensor);
+  
+  
+  lastButtons[buttonQFront] = currentVal;
+  buttonQFront++;
+  if (buttonQFront == buttonQSize) buttonQFront = 0;
+ 
+  double sum = 0.0;
+  for (int i = 0; i < buttonQSize; i++){
+    sum += lastButtons[i];
+  }
+  
+ 
+ 
+   if ((sum / buttonQSize) < 0.3) {
+     index = 0;
+     return;
+   }
   
 
   if (gestTakingPlace(maxGestureSize))
@@ -207,6 +229,8 @@ void loop() {
       return;
     }
         
+  } else {
+    delay(2);
   }
 }
 

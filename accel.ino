@@ -724,13 +724,21 @@ double gyroZ(){
 int MPU6050_read(int start, uint8_t *buffer, int size)
 {
   int i, n, error;
+  //Serial.println("begin");
   Wire.beginTransmission(MPU6050_I2C_ADDRESS);
-
+  //delay(1);
+  //Serial.println("write");
   n = Wire.write(start);
+    //delay(1);
+
+  
   if (n != 1)
     return (-10);
-
+  //Serial.println("end");
   n = Wire.endTransmission(false);    // hold the I2C-bus
+    //delay(1);
+
+  Serial.println(n);
 
   if (n != 0)
     return (n);
@@ -739,9 +747,11 @@ int MPU6050_read(int start, uint8_t *buffer, int size)
 
   // Third parameter is true: relase I2C-bus after data is read.
   Wire.requestFrom(MPU6050_I2C_ADDRESS, size, true);
+    //delay(1);
+
   i = 0;
   
- 
+  //Serial.println("avail");
   while(Wire.available() && i<size)
   {
     buffer[i++]=Wire.read();
